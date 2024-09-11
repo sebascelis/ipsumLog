@@ -4,7 +4,7 @@ from loginIPS.models.user      import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username','lastname', 'email', "password"] 
+        fields = ['username','lastname', 'email', 'password'] 
     
 
     def to_representation(self, obj):
@@ -13,8 +13,9 @@ class UserSerializer(serializers.ModelSerializer):
             'id'      : user.id,
             'username': user.username,
             'lastname'  : user.lastname,
-            'email'   : user.email,
+            'email'   : user.email
         }
+
 
 
 class UserSerializerUpdate(serializers.ModelSerializer):

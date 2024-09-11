@@ -128,7 +128,6 @@ export default {
   .header nav { 
     height: 100%; 
     width: 20%; 
- 
     display: flex; 
     justify-content: space-around; 
     align-items: center; 
@@ -163,13 +162,12 @@ export default {
     
     height: 80vh; 
     margin: 0%; 
-    padding: 0%; 
+    padding: 2%; 
   } 
 
   footer{
     background-color: #283747;
     height: 80px;
-    margin: -20px;
   }
  
 </style>  

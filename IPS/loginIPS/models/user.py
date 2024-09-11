@@ -38,6 +38,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     secondQuestion  = models.CharField(max_length=100)
     thirdQuestion   = models.CharField(max_length=100)
     isActivate      = models.BooleanField(default=True)
+    image           = models.CharField()
+
 
 
     def save(self, **kwargs):

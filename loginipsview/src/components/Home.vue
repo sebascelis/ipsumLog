@@ -1,8 +1,8 @@
 <template> 
  
     <div v-if="loaded" class="information"> 
-        <h1>Hi, <span>{{username}}!</span></h1> 
-        <h2>Set up your data</h2>
+        <h1>Set up your data</h1> 
+        <h2>Hi, <span>{{username}}!</span></h2>
         <div class="container_information"> 
         <form v-on:submit.prevent="processSignUp">
             <div>
@@ -42,7 +42,8 @@ export default {
             password: "",
             loaded: false,
             editActive: false,
-            userId: ""
+            userId: "",
+            image : ""
              
         } 
     }, 
@@ -58,7 +59,6 @@ export default {
             let token = localStorage.getItem("token_access"); 
             let userId = decodeJwt(token).user_id.toString(); 
             this.userId = userId;
-            console.log(this.userId);
              
             axios.get(`http://localhost:8000/user/${this.userId}/`, {headers: {'Authorization': `Bearer ${token}`}}) 
                 .then((result) => { 
@@ -71,7 +71,6 @@ export default {
             axios.get(`http://localhost:8000/user/${this.userId}/`)
                 .then((result) => { 
                     
-                    console.log(result.data)
                     this.username = result.data.username,
                     this.lastname = result.data.lastname,
                     this.password = result.data.password
@@ -83,6 +82,7 @@ export default {
             document.getElementById("username").disabled=false;
             document.getElementById("lastname").disabled=false;
             document.getElementById("password").disabled=false;
+            document.getElementById("image").disabled=false;
             this.editActive = true;
         },
 
@@ -90,6 +90,7 @@ export default {
             document.getElementById("username").disabled=true;
             document.getElementById("lastname").disabled=true;
             document.getElementById("password").disabled=true;
+            document.getElementById("image").disabled=true;
             
             axios.get(`http://localhost:8000/user/form/${this.userId}/`)
             .then((result) => { 
@@ -101,16 +102,23 @@ export default {
             document.getElementById("password").value=this.password,
             this.editActive = false
         },
-
+        onFileChange(event) {
+            const file = event.target.files[0];
+            if (file) {
+            this.fileName = `..src/assets/${file.name}`;
+        }
+      },
         sendForm: function(){
             this.username = document.getElementById("username").value;
             this.lastname = document.getElementById("lastname").value;
             this.password = document.getElementById("password").value;
+            console.log(this.image)
             let formData = {
                 user : this.userId,
                 username: this.username,
                 lastname : this.lastname,
-                password : this.password
+                password : this.password,
+                image : this.image
             }
 
             axios.put( 
@@ -122,7 +130,7 @@ export default {
                         user: this.userId,
                         username: response.data.username,
                         lastname: response.data.lastname,
-                        password: response.data.password,  
+                        password: response.data.password
                     } 
                      
                     this.$emit('formUpdate', form) 
@@ -181,7 +189,6 @@ export default {
         border: 3px solid  #283747; 
         border-radius: 10px; 
         width: 25%; 
-        height: 55%;
         display: flex; 
         flex-direction: column; 
         justify-content: center; 
@@ -196,8 +203,9 @@ export default {
     } 
  
     .information form{ 
-        width: 70%; 
+        width: 100%; 
         text-align: center;
+        padding: 2%;
          
     } 
  

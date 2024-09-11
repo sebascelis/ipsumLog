@@ -24,7 +24,7 @@ export default {
             user: { 
                 email:"",
                 username: "", 
-                password:"" 
+                password:""
             } 
         } 
     }, 

@@ -1,8 +1,8 @@
 <template> 
  
     <div v-if="loaded" class="information"> 
-        <h1>Set up your security questions</h1> 
-        <h2>Hi, <span>{{username}}!</span></h2>
+        <h1>Hi, <span>{{username}}!</span></h1> 
+        <h2>Set up your security questions</h2>
         <div class="container_information"> 
         <form v-on:submit.prevent="sendForm">
             <div>
@@ -16,6 +16,10 @@
             <div>
                 <label for="thirdQuestion">Favorite Artist</label>
                 <input type="text" id="thirdQuestion" v-model="thirdQuestion" required disabled>
+            </div>
+            <div>
+                <label for="fourImage">Profile image</label>
+                <input type="file" id="image" @change="onFileChange" required disabled>
             </div>
             <button type="submit" v-if="!editActive" v-on:click="editData">Edit</button>
             <button type="submit" v-if="editActive" v-on:click="editCancel">Cancell</button>
@@ -43,7 +47,8 @@ export default {
             username : "",
             loaded: false,
             editActive: false,
-            userId: ""
+            userId: "",
+            image: ""
              
         } 
     }, 
@@ -59,7 +64,6 @@ export default {
             let token = localStorage.getItem("token_access"); 
             let userId = decodeJwt(token).user_id.toString(); 
             this.userId = userId;
-            console.log(this.userId);
              
             axios.get(`http://localhost:8000/user/${this.userId}/`, {headers: {'Authorization': `Bearer ${token}`}}) 
                 .then((result) => { 
@@ -72,18 +76,18 @@ export default {
             axios.get(`http://localhost:8000/user/form/${this.userId}/`)
                 .then((result) => { 
                     
-                    console.log(result.data)
                     this.firstQuestion = result.data.firstQuestion,
                     this.secondQuestion = result.data.secondQuestion,
-                    this.thirdQuestion = result.data.thirdQuestion
-
+                    this.thirdQuestion = result.data.thirdQuestion,
+                    this.image = `..assets/${result.data.image}`
+                
                 })
         }, 
-        
         editData: function(){
             document.getElementById("firstQuestion").disabled=false;
             document.getElementById("secondQuestion").disabled=false;
             document.getElementById("thirdQuestion").disabled=false;
+            document.getElementById("image").disabled=false;
             this.editActive = true;
         },
 
@@ -91,27 +95,30 @@ export default {
             document.getElementById("firstQuestion").disabled=true;
             document.getElementById("secondQuestion").disabled=true;
             document.getElementById("thirdQuestion").disabled=true;
+            document.getElementById("image").disabled=true;
             
             axios.get(`http://localhost:8000/user/form/${this.userId}/`)
             .then((result) => { 
-                this.firstQuestion = result.data.firstQuestion,
-                this.secondQuestion = result.data.secondQuestion,
-                this.thirdQuestion = result.data.thirdQuestion }),
-            document.getElementById("firstQuestion").value=this.firstQuestion,
-            document.getElementById("secondQuestion").value=this.secondQuestion,
-            document.getElementById("thirdQuestion").value=this.thirdQuestion,
+                this.username = result.data.username,
+                this.lastname = result.data.lastname,
+                this.password = result.data.password }),
+            document.getElementById("firstQuestion").value=this.username,
+            document.getElementById("secondQuestion").value=this.lastname,
+            document.getElementById("thirdQuestion").value=this.password,
             this.editActive = false
         },
-
         sendForm: function(){
-            this.firstQuestion = document.getElementById("firstQuestion").value;
-            this.secondQuestion = document.getElementById("secondQuestion").value;
-            this.thirdQuestion = document.getElementById("thirdQuestion").value;
+            document.getElementById("firstQuestion").value;
+            document.getElementById("secondQuestion").value;
+            document.getElementById("thirdQuestion").value;
+            document.getElementById("image").files[0].name;
+            console.log(this.image)
             let formData = {
                 user : this.userId,
-                firstQuestion: this.firstQuestion,
-                secondQuestion : this.secondQuestion,
-                thirdQuestion : this.thirdQuestion
+                username: this.username,
+                lastname : this.lastname,
+                password : this.password,
+                image : this.image
             }
 
             axios.put( 
@@ -121,13 +128,12 @@ export default {
                 .then((response) => { 
                     let form = { 
                         user: this.userId,
-                        firstQuestion: response.data.firstQuestion,
-                        secondQuestion: response.data.secondQuestion,
-                        thirdQuestion: response.data.thirdQuestion,  
+                        username: response.data.username,
+                        lastname: response.data.lastname,
+                        password: response.data.password
                     } 
-                    alert("Update data")
-                    this.$emit('formUpdate')
-                    this.editCancel() 
+                     
+                    this.$emit('formUpdate', form) 
                 }) 
                 .catch((error) => { 
      console.log(error) 
@@ -136,7 +142,17 @@ export default {
                 }); 
 
         },
- 
+
+        getImage(e){
+        let image = e.target.files[0];
+        let reader = new FileReader();
+        reader.readAsDataURL(image);
+        reader.onload = e => {
+            this.avatar = e.target.result;
+        }
+        this.loaded = true; 
+    },
+        
         verifyToken: function () { 
             return axios.post("http://localhost:8000/refresh/", {refresh: localStorage.getItem("token_refresh")}, {headers: {}}
  ) 
@@ -183,7 +199,6 @@ export default {
         border: 3px solid  #283747; 
         border-radius: 10px; 
         width: 25%; 
-        height: 55%;
         display: flex; 
         flex-direction: column; 
         justify-content: center; 

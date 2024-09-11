@@ -32,7 +32,7 @@ export default {
                 username: "", 
                 lastname : "",
                 email: "", 
-                password: "",
+                password: ""
             } 
 
         } 

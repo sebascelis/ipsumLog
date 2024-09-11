@@ -21,7 +21,7 @@ class UserSerializerT(serializers.ModelSerializer):
 class UserSerializerTUpdate(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['firstQuestion', 'secondQuestion', 'thirdQuestion'] 
+        fields = ['firstQuestion', 'secondQuestion', 'thirdQuestion', 'image'] 
     
 
     def to_representation_two(self, obj):
@@ -29,7 +29,8 @@ class UserSerializerTUpdate(serializers.ModelSerializer):
         return {
             'firstQuestion' : firstQuestion,
             'secondQuestion': secondQuestion,
-            'thirdQuestion': thirsQuestion
+            'thirdQuestion': thirsQuestion,
+            'this.image': image
         }
 
     
